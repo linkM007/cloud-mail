@@ -16,3 +16,8 @@ app.post('/public/addUser', async (c) => {
 	await publicService.addUser(c, await c.req.json());
 	return c.json(result.ok());
 });
+
+app.post('/public/fetchCode', async (c) => {
+	const data = await publicService.fetchCode(c, await c.req.json());
+	return c.json(result.ok(data));
+});

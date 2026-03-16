@@ -94,6 +94,42 @@ const publicService = {
 
 	},
 
+	async fetchCode(c, params) {
+		const { toEmail, pattern, subject } = params;
+
+		const emails = await this.emailList(c, {
+			toEmail,
+			subject,
+			num: 1,
+			size: 1,
+			timeSort: 'desc'
+		});
+
+		if (emails && emails.length > 0) {
+			const latestEmail = emails[0];
+			const content = latestEmail.text || latestEmail.content || '';
+
+			if (pattern) {
+				const regex = new RegExp(pattern);
+				const match = content.match(regex);
+				return {
+					code: match ? match[0] : null,
+					fullContent: content,
+					createTime: latestEmail.createTime
+				};
+			}
+
+			const defaultMatch = content.match(/\d{4,6}/);
+			return {
+				code: defaultMatch ? defaultMatch[0] : null,
+				fullContent: content,
+				createTime: latestEmail.createTime
+			};
+		}
+
+		throw new BizError(t('notExistUser') + ' or No Email Found', 404);
+	},
+
 	async addUser(c, params) {
 		const { list } = params;
 
